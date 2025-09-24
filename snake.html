@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Snake - Game Hub</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <!-- Navbar -->
+
+    <header class="navbar">
+        <h1>🎮 Game Hub</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="snake.html" class="active">Snake</a>
+            <a href="tictactoe.html">Tic Tac Toe</a>
+            <a href="memory.html">Memory</a>
+            <a href="dice.html">Dice</a>
+            <a href="wordle.html">Wordle</a>
+        </nav>
+        <div class="controls">
+            <button id="themeToggle">🌙</button>
+            <button id="openLeaderboard">Leaderboard</button>
+        </div>
+    </header>
+
+    <!-- Game Content -->
+    <main>
+        <h2>Snake Game</h2>
+        <p>Use arrow keys to move the snake. Eat food, grow longer, and try to get the highest score!</p>
+        <canvas id="snakeCanvas" width="400" height="400"></canvas>
+        <p id="snakeScore">Score: 0</p>
+    </main>
+
+    <aside id="leaderboard" class="hidden">
+        <h3>Leaderboard</h3>
+        <div id="scores"></div>
+        <button id="closeLeaderboard">Close</button>
+    </aside>
+
+    <script src="js/common.js"></script>
+    <script src="js/snake.js"></script>
+</body>
+
+</html>
