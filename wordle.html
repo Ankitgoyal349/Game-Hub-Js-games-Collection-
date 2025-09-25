@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Game Hub - Wordle</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <h1>🎮 Game Hub</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="snake.html">Snake</a>
+            <a href="tictactoe.html">Tic Tac Toe</a>
+            <a href="memory.html">Memory</a>
+            <a href="dice.html">Dice</a>
+            <a href="wordle.html" class="active">Wordle</a>
+        </nav>
+        <div class="controls">
+            <button id="themeToggle">🌙</button>
+            <button id="openLeaderboard">Leaderboard</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="game-page">
+        <section>
+            <h2>Wordle 🟩🟨⬜</h2>
+            <p>
+                Guess the secret 5-letter word in 6 tries! Each guess will give you hints:
+            </p>
+            <ul>
+                <li>🟩 Correct letter in the correct position</li>
+                <li>🟨 Correct letter in the wrong position</li>
+                <li>⬜ Letter not in the word</li>
+            </ul>
+            <div id="wordle-game" class="game-container">
+                <!-- Wordle grid + keyboard will be rendered here via JS -->
+                <p><em>Game coming soon...</em></p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Leaderboard -->
+    <aside id="leaderboard" class="hidden">
+        <h3>Leaderboard</h3>
+        <div id="scores"></div>
+        <button id="closeLeaderboard">Close</button>
+    </aside>
+
+    <script src="js/common.js"></script>
+    <script src="js/wordle.js"></script>
+</body>
+
+</html>
