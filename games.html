@@ -136,6 +136,44 @@
         </div>
     </div>
 
-    <script src="./js/script.js" type="module"></script>
+    <!-- <script src="./js/script.js" type="module"></script> -->
+
+    <script type="module">
+        import { getLoggedInUserEmail, setupLogout } from './js/auth.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const userEmail = getLoggedInUserEmail();
+            const userInfoElement = document.getElementById('userInfo');
+            
+            if (!userEmail) {
+                // If not logged in, redirect to home page
+                window.location.href = 'Home.html';
+                return;
+            }
+
+            // Simple way to get a username from the email (e.g., 'user@example.com' -> 'user')
+            const username = userEmail.split('@')[0];
+            
+            if (userInfoElement) {
+                userInfoElement.textContent = `Hello, ${username}!`;
+                userInfoElement.classList.remove('hidden');
+            }
+
+            setupLogout(); // Initialize the logout button
+            
+            // Simple mobile menu toggle logic (copied from other pages)
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobile-menu');
+            if (btn && menu) {
+                // Create mobile menu div if it doesn't exist in the dashboard file
+                if (!menu) {
+                    // This logic assumes you'll add the mobile menu div structure as found in Home.html
+                }
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

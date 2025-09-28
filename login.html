@@ -64,5 +64,19 @@
         </div>
     </div>
     
+    <script src="./js/auth.js" type="module"></script>
+    <script>
+        // Simple mobile menu toggle logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobile-menu');
+            if (btn && menu) {
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>
