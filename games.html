@@ -1,179 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Game Hub - Games</title>
-    <link rel="stylesheet" href="./css/style.css" />
+    <title>Game Hub - Arcade</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Custom Tailwind Config for animations -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-once': 'spin 0.5s ease-out 1',
+                        'flip': 'flip 0.6s ease-out',
+                    },
+                    keyframes: {
+                        flip: {
+                            '0%': { transform: 'rotateY(0deg)' },
+                            '100%': { transform: 'rotateY(180deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles */
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Tic Tac Toe Grid Styles */
+        .tictactoe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            width: 300px;
+            height: 300px;
+            max-width: 100%;
+        }
+        .tictactoe-cell {
+            border: 2px solid #e5e7eb; /* gray-200 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .tictactoe-cell:hover { background-color: #f3f4f6; } /* gray-100 */
+        .dark .tictactoe-cell { border-color: #374151; /* gray-700 */ }
+        .dark .tictactoe-cell:hover { background-color: #1f2937; } /* gray-800 */
+
+        /* Snake Canvas Styles */
+        #snake-canvas {
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+
+        /* Memory Card Styles */
+        .memory-card {
+            width: 100%;
+            padding-bottom: 100%; /* Aspect ratio 1:1 */
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .memory-card-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border-radius: 0.75rem;
+        }
+        .memory-card.flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+        .memory-card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            border-radius: 0.75rem;
+        }
+        .memory-card-front {
+            background-color: #ffffff; /* white */
+            color: #1f2937; /* gray-800 */
+            transform: rotateY(180deg);
+        }
+        .memory-card-back {
+            background-color: #3b82f6; /* blue-500 */
+            color: #ffffff; /* white */
+            border: 3px solid #2563eb; /* blue-600 */
+        }
+        .dark .memory-card-front { background-color: #1f2937; /* gray-800 */ color: #f3f4f6; }
+        .dark .memory-card-back { background-color: #1d4ed8; /* blue-700 */ border-color: #2563eb; }
+
+        /* General Game Grid Layout */
+        #games-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Navbar -->
-    <header class="navbar fixed top-0 w-full bg-white dark:bg-gray-800 shadow-md transition-colors duration-300 z-50 rounded-b-xl">
+    
+    <!-- Navbar (Authenticated View - Now visible by default) -->
+    <header class="navbar fixed top-0 w-full bg-white dark:bg-gray-800 shadow-xl rounded-b-xl z-50">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                <span class="text-blue-500">🎮</span> Game Hub
-            </h1>
+            <a href="Home.html" class="flex items-center space-x-2">
+                <span class="text-3xl text-blue-500 transition-transform transform hover:rotate-12">🎮</span>
+                <h1 class="text-2xl font-extrabold text-gray-800 dark:text-gray-100">Game Hub</h1>
+            </a>
             <nav class="hidden md:flex space-x-4">
-                <a href="#tictactoe" class="nav-link py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-                    Tic Tac Toe
-                </a>
-                <a href="#memory" class="nav-link py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-                    Memory
-                </a>
-                <a href="#dice" class="nav-link py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-                    Dice
-                </a>
-                <a href="#snake" class="nav-link py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-                    Snake
-                </a>
-                <a href="#wordle" class="nav-link py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-                    Wordle
-                </a>
+                <a href="#games-grid" class="py-2 px-4 rounded-lg font-medium text-blue-500 dark:text-blue-400 transition-colors border-b-2 border-blue-500">Arcade</a>
+                <a href="#leaderboard" class="py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">Leaderboard</a>
             </nav>
-            <div class="controls flex items-center space-x-2">
-                <div id="userInfo" class="text-gray-800 dark:text-gray-200"></div>
-                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300 hover:ring-2 hover:ring-blue-500 focus:outline-none">
-                    <span id="theme-icon">🌙</span>
-                </button>
-                <button id="logoutBtn" class="py-2 px-4 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+            <div class="controls flex items-center space-x-3">
+                <span id="userInfo" class="text-sm font-medium text-gray-800 dark:text-gray-200 hidden md:block truncate">Hello, User!</span>
+                
+                <a href="login.html" id="logoutBtn" class="py-2 px-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg whitespace-nowrap">
                     Logout
-                </button>
+                </a>
             </div>
+            <button id="mobileMenuBtn" class="md:hidden p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="pt-20 pb-10 container mx-auto px-4">
-        <!-- Tic Tac Toe Section -->
-        <section id="tictactoe" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Tic Tac Toe ❌⭕</h2>
-            <div class="flex flex-col items-center">
-                <div id="tictactoe-board" class="mt-4 rounded-xl overflow-hidden shadow-xl"></div>
-                <p id="tictactoe-status" class="mt-4 text-center text-lg font-medium text-gray-700 dark:text-gray-300">Player X's turn</p>
-                <button id="restart-tictactoe" class="mt-4 px-6 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                    Restart
-                </button>
-            </div>
-        </section>
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobileMenu" class="fixed top-16 left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 hidden md:hidden rounded-b-xl">
+        <nav class="flex flex-col p-4 space-y-2">
+            <a href="#games-grid" class="py-2 px-4 rounded-lg font-medium text-blue-500 dark:text-blue-400 transition-colors border-l-2 border-blue-500">Arcade</a>
+            <a href="#leaderboard" class="py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">Leaderboard</a>
+        </nav>
+    </div>
 
-        <!-- Memory Game Section -->
-        <section id="memory" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Memory Game 🃏</h2>
-            <div class="flex flex-col items-center">
-                <div id="memory-board" class="mt-4"></div>
-                <p id="memory-status" class="mt-4 text-center text-lg font-medium text-gray-700 dark:text-gray-300">Moves: 0</p>
-                <button id="restart-memory" class="mt-4 px-6 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                    Restart
-                </button>
-            </div>
-        </section>
-
-        <!-- Dice Roller Section -->
-        <section id="dice" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Dice Roller 🎲</h2>
-            <div class="flex flex-col items-center">
-                <div id="dice-result" class="text-8xl font-bold text-gray-800 dark:text-gray-100 transition-transform duration-500 transform-gpu my-4">🎲</div>
-                <button id="roll-dice" class="px-8 py-4 bg-blue-500 text-white rounded-lg font-bold text-xl hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                    Roll Dice!
-                </button>
-            </div>
-        </section>
-        
-        <!-- Snake Game Section -->
-        <section id="snake" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Snake Game 🐍</h2>
-            <div class="flex flex-col items-center">
-                <canvas id="snake-canvas" width="400" height="400" class="border-2 border-gray-400 bg-gray-100 rounded-lg shadow-inner"></canvas>
-                <p id="snake-score" class="text-xl font-bold text-gray-800 dark:text-gray-100 mt-4">Score: 0</p>
-                <div class="flex space-x-4 mt-4">
-                    <button id="start-snake" class="px-6 py-3 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                        Start
-                    </button>
-                    <button id="pause-snake" class="px-6 py-3 bg-yellow-500 text-white rounded-lg font-bold hover:bg-yellow-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                        Pause
-                    </button>
-                    <button id="reset-snake" class="px-6 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                        Reset
-                    </button>
+    <!-- Arcade View (Main Content - Now visible by default) -->
+    <div id="arcade-view">
+        <main class="pt-24 pb-10 container mx-auto px-4">
+            <h2 class="text-4xl font-extrabold text-center text-gray-800 dark:text-gray-100 mb-8 pt-4">
+                The Game Arcade 👾
+            </h2>
+            
+            <!-- Games Grid -->
+            <section id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                
+                <!-- Tic Tac Toe Section -->
+                <div id="tictactoe" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Tic Tac Toe ❌⭕</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="tictactoe-board" class="tictactoe-grid shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl">
+                            <!-- Cells for Tic Tac Toe -->
+                            <div class="tictactoe-cell text-red-500">X</div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell text-blue-500">O</div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell"></div>
+                            <div class="tictactoe-cell"></div>
+                        </div>
+                        <p id="tictactoe-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">Status: Waiting for input...</p>
+                        <button id="restart-tictactoe" class="mt-4 px-6 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                            Restart Game
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Wordle Section -->
-        <section id="wordle" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Wordle 🟩🟨⬜</h2>
-            <div class="flex flex-col items-center">
-                <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Guess the secret 5-letter word in 6 tries!</p>
-                <div id="wordle-grid" class="mt-4"></div>
-                <input type="text" id="wordle-input" maxlength="5" placeholder="Enter word" class="mt-4 p-3 rounded-lg border-2 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-xl uppercase">
-                <button id="submit-wordle" class="mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                    Submit
-                </button>
-            </div>
-        </section>
+                <!-- Memory Game Section -->
+                <div id="memory" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-green-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Memory Match 🃏</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="memory-board" class="mt-4 grid gap-3 grid-cols-4 max-w-sm w-full">
+                            <!-- Placeholder Cards -->
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍎</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍌</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🥝</div></div></div>
+                            <div class="memory-card flipped"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍇</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍉</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍓</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍒</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍍</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍌</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍎</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍇</div></div></div>
+                            <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🥝</div></div></div>
+                        </div>
+                        <p id="memory-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">Moves: 0</p>
+                        <button id="restart-memory" class="mt-4 px-6 py-3 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                            Restart/Shuffle
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dice Roller Section -->
+                <div id="dice" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-yellow-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Dice Roller 🎲</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="dice-result" class="dice-result-placeholder text-[120px] font-extrabold text-yellow-500 dark:text-yellow-400 my-8 transition-transform duration-100">⚅</div>
+                        <button id="roll-dice" class="px-8 py-4 bg-yellow-500 text-white rounded-xl font-bold text-xl hover:bg-yellow-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                            Roll Dice!
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Snake Game Section -->
+                <div id="snake" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Snake Game 🐍</h3>
+                    <div class="flex flex-col items-center">
+                        <canvas id="snake-canvas" width="300" height="300" class="border-4 border-gray-400 bg-gray-100 rounded-lg shadow-inner w-full max-w-xs"></canvas>
+                        <p id="snake-score" class="text-xl font-bold text-gray-800 dark:text-gray-100 mt-4">Score: 0</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Use arrow keys (or swipe on touch) to move.</p>
+                        <div class="flex space-x-4 mt-4">
+                            <button id="start-snake" class="px-5 py-2 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Start
+                            </button>
+                            <button id="reset-snake" class="px-5 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wordle Section -->
+                <div id="wordle" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-orange-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Wordle 🟩🟨⬜</h3>
+                    <div class="flex flex-col items-center w-full max-w-sm mx-auto">
+                        <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Guess the 5-letter word in 6 tries!</p>
+                        <div id="wordle-grid" class="mt-4 space-y-1">
+                            <!-- Placeholder Grid for Wordle -->
+                            <div class="flex space-x-1">
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-green-500 bg-green-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">W</div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-yellow-500 bg-yellow-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">O</div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-500 bg-gray-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">R</div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md">D</div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md">L</div>
+                            </div>
+                            <div class="flex space-x-1">
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
+                            </div>
+                        </div>
+                        <input type="text" id="wordle-input" maxlength="5" placeholder="Enter word" 
+                            class="mt-6 p-3 rounded-xl border-2 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500 w-full text-xl uppercase shadow-inner"
+                            pattern="[A-Za-z]{5}" title="5 letter word only">
+                        <button id="submit-wordle" class="mt-4 px-6 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-full">
+                            Submit Guess
+                        </button>
+                        <button id="restart-wordle" class="mt-4 px-6 py-3 bg-gray-500 text-white rounded-xl font-bold hover:bg-gray-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-full">
+                            New Word
+                        </button>
+                    </div>
+                </div>
 
-        <!-- Leaderboard Section -->
-        <section id="leaderboard" class="game-section p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 transition-colors duration-300">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">Global Leaderboard 🏆</h2>
-            <div id="leaderboard-container">
-                <!-- Leaderboard content will be dynamically generated here -->
-            </div>
-        </section>
-    </main>
+            </section>
+
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="game-card p-10 mt-12 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-colors duration-300 border-t-4 border-blue-500">
+                <h2 class="text-4xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 text-center">Global Leaderboard 🏆</h2>
+                <p class="text-center text-gray-500 dark:text-gray-400 mb-6">Scores show the highest points earned by any user across all games.</p>
+                <div id="leaderboard-container">
+                    <!-- Static Leaderboard Mockup for UI -->
+                    <div class="space-y-4 mt-6">
+                        <div class="flex items-center justify-between p-4 bg-blue-50 dark:bg-gray-700 rounded-xl shadow-md border-l-4 border-blue-500">
+                            <span class="text-2xl font-extrabold text-yellow-500 w-10 text-center">🥇</span>
+                            <div class="flex-1 min-w-0 mx-4"><p class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">ProGamer99</p><p class="text-sm text-gray-500 dark:text-gray-400">Memory Match</p></div>
+                            <span class="text-xl font-bold text-blue-600 dark:text-blue-400">95 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border-l-4 border-gray-300 dark:border-gray-600">
+                            <span class="text-2xl font-extrabold text-gray-400 w-10 text-center">🥈</span>
+                            <div class="flex-1 min-w-0 mx-4"><p class="text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">ArcadeMaster</p><p class="text-sm text-gray-500 dark:text-gray-400">Tic Tac Toe</p></div>
+                            <span class="text-xl font-bold text-blue-600 dark:text-blue-400">10 pts</span>
+                        </div>
+                        <p class="text-center text-gray-500 dark:text-gray-400 mt-8">More scores will load here when the game logic is implemented!</p>
+                    </div>
+                </div>
+                <p id="current-user-id" class="text-xs text-center text-gray-400 mt-6 break-words">User ID: N/A (Login Required)</p>
+            </section>
+        </main>
+    </div>
 
     <!-- Modal for messages -->
     <div id="game-message-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100]">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl text-center max-w-sm w-full">
-            <h3 id="modal-title" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4"></h3>
-            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6"></p>
-            <button id="modal-close" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center max-w-sm w-full transform transition-all duration-300" id="modal-content">
+            <h3 id="modal-title" class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-4">Message Title</h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-400 mb-6 text-lg">This is a message box used instead of alert().</p>
+            <button id="modal-close" class="px-6 py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
                 Close
             </button>
         </div>
     </div>
-
-    <!-- <script src="./js/script.js" type="module"></script> -->
-
-    <script type="module">
-        import { getLoggedInUserEmail, setupLogout } from './js/auth.js';
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const userEmail = getLoggedInUserEmail();
-            const userInfoElement = document.getElementById('userInfo');
-            
-            if (!userEmail) {
-                // If not logged in, redirect to home page
-                window.location.href = 'Home.html';
-                return;
-            }
-
-            // Simple way to get a username from the email (e.g., 'user@example.com' -> 'user')
-            const username = userEmail.split('@')[0];
-            
-            if (userInfoElement) {
-                userInfoElement.textContent = `Hello, ${username}!`;
-                userInfoElement.classList.remove('hidden');
-            }
-
-            setupLogout(); // Initialize the logout button
-            
-            // Simple mobile menu toggle logic (copied from other pages)
-            const btn = document.getElementById('mobileMenuBtn');
-            const menu = document.getElementById('mobile-menu');
-            if (btn && menu) {
-                // Create mobile menu div if it doesn't exist in the dashboard file
-                if (!menu) {
-                    // This logic assumes you'll add the mobile menu div structure as found in Home.html
-                }
-                btn.addEventListener('click', () => {
-                    menu.classList.toggle('hidden');
-                });
-            }
-        });
-    </script>
+    
+    <!-- NOTE: All JavaScript logic and imports have been removed per user request. -->
+    
 </body>
 </html>
+    

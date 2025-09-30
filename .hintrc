@@ -13,7 +13,8 @@
       "default",
       {
         "ignore": [
-          "user-select"
+          "user-select",
+          "image-rendering: crisp-edges"
         ]
       }
     ]
