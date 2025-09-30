@@ -129,7 +129,7 @@
                 <a href="#leaderboard" class="py-2 px-4 rounded-lg font-medium text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">Leaderboard</a>
             </nav>
             <div class="controls flex items-center space-x-3">
-                <span id="userInfo" class="text-sm font-medium text-gray-800 dark:text-gray-200 hidden md:block truncate">Hello, User!</span>
+                <span id="userInfo" class="text-sm font-medium text-gray-800 dark:text-gray-200 hidden md:block truncate">Hello, Player!</span>
                 
                 <a href="login.html" id="logoutBtn" class="py-2 px-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg whitespace-nowrap">
                     Logout
@@ -309,8 +309,37 @@
         </div>
     </div>
     
-    <!-- NOTE: All JavaScript logic and imports have been removed per user request. -->
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userInfoEl = document.getElementById('userInfo');
+
+            const userEmail = localStorage.getItem('userEmail');
+            
+            // Set default text and ensure element is visible (since it starts hidden)
+            // It starts as hidden, so we need to remove that class.
+            userInfoEl.classList.remove('hidden'); 
+            userInfoEl.textContent = 'Hello, Gamer!'; // Default if no email is found
+
+            if (userEmail) {
+                // Extract the username (before the '@' symbol)
+                let username = userEmail.split('@')[0];
+                
+                // Capitalize the first letter for a nice greeting
+                username = username.charAt(0).toUpperCase() + username.slice(1);
+
+                // Update the element text
+                userInfoEl.textContent = `Hello, ${username}!`;
+            }
+            
+            // Mobile Menu Toggle (re-added for basic UI responsiveness)
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
-    
