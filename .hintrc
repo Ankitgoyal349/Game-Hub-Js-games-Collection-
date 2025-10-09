@@ -17,6 +17,7 @@
           "image-rendering: crisp-edges"
         ]
       }
-    ]
+    ],
+    "meta-viewport": "off"
   }
 }

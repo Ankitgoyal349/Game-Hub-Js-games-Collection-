@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">   
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Hub - Arcade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Custom Tailwind Config for animations -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -109,6 +107,42 @@
         .dark .memory-card-front { background-color: #1f2937; /* gray-800 */ color: #f3f4f6; }
         .dark .memory-card-back { background-color: #1d4ed8; /* blue-700 */ border-color: #2563eb; }
 
+        /* Sudoku Custom Styles */
+        .sudoku-cell {
+            border: 1px solid #d1d5db; /* gray-300 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+        .dark .sudoku-cell { background-color: #1f2937; border-color: #4b5563; }
+        
+        /* Heavy 3x3 Sudoku borders */
+        #sudoku-grid > div:nth-child(3n):not(:nth-child(9n)) { border-right-width: 3px; border-right-color: #6b7280; }
+        #sudoku-grid > div:nth-child(9n+1):nth-child(-n+27) { border-bottom-width: 3px; border-bottom-color: #6b7280; }
+        #sudoku-grid > div:nth-child(9n+1):nth-child(-n+54) { border-bottom-width: 3px; border-bottom-color: #6b7280; }
+        .dark #sudoku-grid > div:nth-child(3n):not(:nth-child(9n)) { border-right-color: #9ca3af; }
+        .dark #sudoku-grid > div:nth-child(9n+1):nth-child(-n+27) { border-bottom-color: #9ca3af; }
+        .dark #sudoku-grid > div:nth-child(9n+1):nth-child(-n+54) { border-bottom-color: #9ca3af; }
+
+        /* Maze Custom Styles */
+        .maze-cell {
+            border: 1px solid #e5e7eb; /* Light border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: #ffffff; /* Path */
+        }
+        .dark .maze-cell { background-color: #1f2937; border-color: #4b5563; }
+        .maze-wall { background-color: #4b5563; /* Wall */ }
+        .maze-path { background-color: #d1d5db; /* Path Taken */ }
+
+
         /* General Game Grid Layout */
         #games-grid {
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -118,7 +152,6 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     
-    <!-- Navbar (Authenticated View - Now visible by default) -->
     <header class="navbar fixed top-0 w-full bg-white dark:bg-gray-800 shadow-xl rounded-b-xl z-50">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <a href="Home.html" class="flex items-center space-x-2">
@@ -142,7 +175,6 @@
         </div>
     </header>
 
-    <!-- Mobile Menu (Hidden by default) -->
     <div id="mobileMenu" class="fixed top-16 left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 hidden md:hidden rounded-b-xl">
         <nav class="flex flex-col p-4 space-y-2">
             <a href="#games-grid" class="py-2 px-4 rounded-lg font-medium text-blue-500 dark:text-blue-400 transition-colors border-l-2 border-blue-500">Arcade</a>
@@ -150,22 +182,18 @@
         </nav>
     </div>
 
-    <!-- Arcade View (Main Content - Now visible by default) -->
     <div id="arcade-view">
         <main class="pt-24 pb-10 container mx-auto px-4">
             <h2 class="text-4xl font-extrabold text-center text-gray-800 dark:text-gray-100 mb-8 pt-4">
                 The Game Arcade 👾
             </h2>
             
-            <!-- Games Grid -->
             <section id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 
-                <!-- Tic Tac Toe Section -->
                 <div id="tictactoe" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Tic Tac Toe ❌⭕</h3>
                     <div class="flex flex-col items-center">
                         <div id="tictactoe-board" class="tictactoe-grid shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl">
-                            <!-- Cells for Tic Tac Toe -->
                             <div class="tictactoe-cell text-red-500">X</div>
                             <div class="tictactoe-cell"></div>
                             <div class="tictactoe-cell"></div>
@@ -183,12 +211,109 @@
                     </div>
                 </div>
 
-                <!-- Memory Game Section -->
+                <div id="nqueens" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">N-Queens Solver 👑</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="nqueens-board" class="grid grid-cols-4 grid-rows-4 w-64 h-64 max-w-full shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center text-4xl text-cyan-500">♛</div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl text-cyan-500">♛</div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl text-cyan-500">♛</div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center"></div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                            <div class="bg-white dark:bg-gray-800 flex items-center justify-center text-4xl text-cyan-500">♛</div>
+                            <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center"></div>
+                        </div>
+                        <p id="nqueens-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">N=4 Solution Displayed</p>
+                        <div class="flex space-x-4 mt-4">
+                            <button id="solve-nqueens" class="px-5 py-2 bg-cyan-500 text-white rounded-xl font-bold hover:bg-cyan-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Solve for N=8
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sudoku" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Sudoku Solver 🔢</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="sudoku-grid" class="grid grid-cols-9 grid-rows-9 w-64 h-64 max-w-full shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <div class="sudoku-cell text-red-500">5</div><div class="sudoku-cell text-red-500">3</div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell text-red-500">6</div><div class="sudoku-cell"></div><div class="sudoku-cell">9</div>
+                            <div class="sudoku-cell text-red-500">8</div><div class="sudoku-cell text-red-500">1</div><div class="sudoku-cell"></div>
+                            
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
+                        </div>
+                        <p id="sudoku-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">Enter a puzzle to solve.</p>
+                        <div class="flex space-x-4 mt-4">
+                            <button id="load-sudoku" class="px-5 py-2 bg-gray-500 text-white rounded-xl font-bold hover:bg-gray-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Load Puzzle
+                            </button>
+                            <button id="solve-sudoku" class="px-5 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Solve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rat-in-maze" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/30">
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Rat in a Maze 🧀</h3>
+                    <div class="flex flex-col items-center">
+                        <div id="maze-grid" class="grid grid-cols-5 grid-rows-5 w-64 h-64 max-w-full shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <div class="maze-cell text-indigo-500">🐀</div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell"></div>
+                            <div class="maze-cell maze-wall"></div>
+                            <div class="maze-cell text-yellow-500">🧀</div>
+                        </div>
+                        <p id="maze-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">Start (🐀) to Goal (🧀)</p>
+                        <div class="flex space-x-4 mt-4">
+                            <button id="solve-maze" class="px-5 py-2 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Find Path
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="memory" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-green-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Memory Match 🃏</h3>
                     <div class="flex flex-col items-center">
                         <div id="memory-board" class="mt-4 grid gap-3 grid-cols-4 max-w-sm w-full">
-                            <!-- Placeholder Cards -->
                             <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍎</div></div></div>
                             <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🍌</div></div></div>
                             <div class="memory-card"><div class="memory-card-inner"><div class="memory-card-face memory-card-back">?</div><div class="memory-card-face memory-card-front">🥝</div></div></div>
@@ -209,7 +334,6 @@
                     </div>
                 </div>
                 
-                <!-- Dice Roller Section -->
                 <div id="dice" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-yellow-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Dice Roller 🎲</h3>
                     <div class="flex flex-col items-center">
@@ -220,7 +344,6 @@
                     </div>
                 </div>
                 
-                <!-- Snake Game Section -->
                 <div id="snake" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Snake Game 🐍</h3>
                     <div class="flex flex-col items-center">
@@ -238,13 +361,11 @@
                     </div>
                 </div>
                 
-                <!-- Wordle Section -->
                 <div id="wordle" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-orange-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Wordle 🟩🟨⬜</h3>
                     <div class="flex flex-col items-center w-full max-w-sm mx-auto">
                         <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Guess the 5-letter word in 6 tries!</p>
                         <div id="wordle-grid" class="mt-4 space-y-1">
-                            <!-- Placeholder Grid for Wordle -->
                             <div class="flex space-x-1">
                                 <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-green-500 bg-green-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">W</div>
                                 <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-yellow-500 bg-yellow-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">O</div>
@@ -274,12 +395,10 @@
 
             </section>
 
-            <!-- Leaderboard Section -->
             <section id="leaderboard" class="game-card p-10 mt-12 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-colors duration-300 border-t-4 border-blue-500">
                 <h2 class="text-4xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 text-center">Global Leaderboard 🏆</h2>
                 <p class="text-center text-gray-500 dark:text-gray-400 mb-6">Scores show the highest points earned by any user across all games.</p>
                 <div id="leaderboard-container">
-                    <!-- Static Leaderboard Mockup for UI -->
                     <div class="space-y-4 mt-6">
                         <div class="flex items-center justify-between p-4 bg-blue-50 dark:bg-gray-700 rounded-xl shadow-md border-l-4 border-blue-500">
                             <span class="text-2xl font-extrabold text-yellow-500 w-10 text-center">🥇</span>
@@ -299,7 +418,6 @@
         </main>
     </div>
 
-    <!-- Modal for messages -->
     <div id="game-message-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100]">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl text-center max-w-sm w-full transform transition-all duration-300" id="modal-content">
             <h3 id="modal-title" class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-4">Message Title</h3>
@@ -340,6 +458,21 @@
                     mobileMenu.classList.toggle('hidden');
                 });
             }
+            
+            // Placeholder/Sample logic for the Modal
+            const modal = document.getElementById('game-message-modal');
+            const closeModalBtn = document.getElementById('modal-close');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+            // Add a sample function to show the modal (can be used by game logic later)
+            window.showMessage = (title, message) => {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-message').textContent = message;
+                modal.classList.remove('hidden');
+            };
         });
     </script>
 </body>
