@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('tictactoe-board');
-    const cells = board ? Array.from(board.children) : [];
     const statusDisplay = document.getElementById('tictactoe-status');
     const restartButton = document.getElementById('restart-tictactoe');
 
     let gameActive = true;
     let currentPlayer = 'X';
-    let gameState = ["", "", "", "", "", "", "", "", ""];
+    let gameState = [];
+    let cells = [];
 
     const winningConditions = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handlePlayerChange = () => {
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        statusDisplay.innerHTML = `It's **${currentPlayer}'s** turn.`;
+        statusDisplay.innerHTML = `Status: It's **${currentPlayer}'s** turn.`;
     };
 
     const handleResultValidation = () => {
@@ -34,9 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let b = gameState[winCondition[1]];
             let c = gameState[winCondition[2]];
 
-            if (a === '' || b === '' || c === '') {
-                continue;
-            }
+            if (a === '' || b === '' || c === '') continue;
             if (a === b && b === c) {
                 roundWon = true;
                 break;
@@ -65,9 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickedCell = event.target;
         const clickedCellIndex = cells.indexOf(clickedCell);
 
-        if (gameState[clickedCellIndex] !== "" || !gameActive) {
-            return;
-        }
+        if (gameState[clickedCellIndex] !== "" || !gameActive) return;
 
         handleCellPlayed(clickedCell, clickedCellIndex);
         handleResultValidation();
@@ -76,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleRestartGame = () => {
         gameActive = true;
         currentPlayer = 'X';
-        gameState = ["", "", "", "", "", "", "", "", ""];
+        gameState = Array(9).fill("");
         statusDisplay.innerHTML = "Status: It's **X's** turn.";
         cells.forEach(cell => {
             cell.innerHTML = "";
@@ -84,14 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Initial setup
-    if (board) {
+    const initializeBoard = () => {
+        if (board) {
+            board.innerHTML = '';
+            // Dynamically create the 9 cells
+            for(let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('tictactoe-cell');
+                board.appendChild(cell);
+            }
+        }
+        cells = board ? Array.from(board.children) : [];
         cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-    }
-    if (restartButton) {
-        restartButton.addEventListener('click', handleRestartGame);
-    }
-    
-    // Set initial status text after everything is ready
-    statusDisplay.innerHTML = "Status: It's **X's** turn.";
+        handleRestartGame();
+    };
+
+    if (restartButton) restartButton.addEventListener('click', initializeBoard);
+    initializeBoard();
 });
