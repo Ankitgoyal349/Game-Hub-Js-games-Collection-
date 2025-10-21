@@ -245,27 +245,19 @@
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Sudoku Solver 🔢</h3>
                     <div class="flex flex-col items-center">
                         <div id="sudoku-grid" class="grid grid-cols-9 grid-rows-9 w-64 h-64 max-w-full shadow-2xl border-4 border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden">
-                            <div class="sudoku-cell text-red-500">5</div><div class="sudoku-cell text-red-500">3</div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell text-red-500">6</div><div class="sudoku-cell"></div><div class="sudoku-cell">9</div>
-                            <div class="sudoku-cell text-red-500">8</div><div class="sudoku-cell text-red-500">1</div><div class="sudoku-cell"></div>
-                            
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                            <div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div><div class="sudoku-cell"></div>
-                        </div>
+                            </div>
                         <p id="sudoku-status" class="mt-6 text-center text-xl font-medium text-gray-700 dark:text-gray-300">Enter a puzzle to solve.</p>
                         <div class="flex space-x-4 mt-4">
                             <button id="load-sudoku" class="px-5 py-2 bg-gray-500 text-white rounded-xl font-bold hover:bg-gray-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
                                 Load Puzzle
                             </button>
-                            <button id="solve-sudoku" class="px-5 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
-                                Solve
+                            
+                            <button id="check-sudoku" class="px-5 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Check Progress
+                            </button>
+
+                            <button id="solve-puzzle" class="px-5 py-2 bg-yellow-600 text-white rounded-xl font-bold hover:bg-yellow-700 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
+                                Give Solution
                             </button>
                         </div>
                     </div>
@@ -337,7 +329,17 @@
                 <div id="dice" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-yellow-500/30">
                     <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Dice Roller 🎲</h3>
                     <div class="flex flex-col items-center">
-                        <div id="dice-result" class="dice-result-placeholder text-[120px] font-extrabold text-yellow-500 dark:text-yellow-400 my-8 transition-transform duration-100">⚅</div>
+                        
+                        <label for="dice-count" class="text-gray-700 dark:text-gray-300 font-semibold mb-2">Number of Dice (1-5):</label>
+                        <input type="number" id="dice-count" value="1" min="1" max="5" 
+                            class="p-2 w-20 text-center rounded-lg border-2 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        
+                        <div id="dice-container" class="flex space-x-4 my-4 h-16 items-center justify-center">
+                            <span id="dice-result" class="text-[60px] font-extrabold text-yellow-500 dark:text-yellow-400">?</span>
+                        </div>
+                        
+                        <p id="dice-total" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-4 mb-6">Total: 0</p>
+                        
                         <button id="roll-dice" class="px-8 py-4 bg-yellow-500 text-white rounded-xl font-bold text-xl hover:bg-yellow-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg">
                             Roll Dice!
                         </button>
@@ -360,38 +362,32 @@
                         </div>
                     </div>
                 </div>
-                
                 <div id="wordle" class="game-card p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-orange-500/30">
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center border-b pb-3 border-gray-200 dark:border-gray-700">Wordle 🟩🟨⬜</h3>
-                    <div class="flex flex-col items-center w-full max-w-sm mx-auto">
-                        <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Guess the 5-letter word in 6 tries!</p>
-                        <div id="wordle-grid" class="mt-4 space-y-1">
-                            <div class="flex space-x-1">
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-green-500 bg-green-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">W</div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-yellow-500 bg-yellow-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">O</div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-500 bg-gray-500 text-white font-bold text-2xl flex items-center justify-center rounded-md">R</div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md">D</div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md">L</div>
-                            </div>
-                            <div class="flex space-x-1">
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-bold text-2xl flex items-center justify-center rounded-md"></div>
-                            </div>
+                <div class="flex flex-col items-center w-full max-w-sm mx-auto">
+                    <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Guess the 5-letter word in 6 tries!</p>
+                    
+                    <div id="wordle-grid" class="mt-4 space-y-1">
                         </div>
-                        <input type="text" id="wordle-input" maxlength="5" placeholder="Enter word" 
-                            class="mt-6 p-3 rounded-xl border-2 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500 w-full text-xl uppercase shadow-inner"
-                            pattern="[A-Za-z]{5}" title="5 letter word only">
-                        <button id="submit-wordle" class="mt-4 px-6 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-full">
+
+                    <input type="text" id="wordle-input" maxlength="5" placeholder="Enter word" 
+                        class="mt-6 p-3 rounded-xl border-2 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-orange-500 w-full text-xl uppercase shadow-inner"
+                        pattern="[A-Za-z]{5}" title="5 letter word only">
+                    
+                    <div class="flex space-x-2 mt-4 w-full">
+                        <button id="submit-wordle" class="px-3 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-1/2">
                             Submit Guess
                         </button>
-                        <button id="restart-wordle" class="mt-4 px-6 py-3 bg-gray-500 text-white rounded-xl font-bold hover:bg-gray-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-full">
-                            New Word
+                        <button id="get-hint" class="px-3 py-3 bg-gray-400 text-white rounded-xl font-bold transition-transform shadow-lg w-1/2 text-sm" disabled> 
+                            Hint Used (Free Hint Provided)
                         </button>
                     </div>
+                    
+                    <button id="restart-wordle" class="mt-4 px-6 py-3 bg-gray-500 text-white rounded-xl font-bold hover:bg-gray-600 transition-transform transform hover:scale-105 active:scale-95 shadow-lg w-full">
+                        New Word
+                    </button>
+                    <p id="hint-display" class="mt-2 text-md font-semibold text-orange-400 dark:text-orange-300"></p>
                 </div>
+            </div>
 
             </section>
 

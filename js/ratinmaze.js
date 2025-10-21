@@ -1,11 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const gridElement = document.getElementById('maze-grid');
     const statusDisplay = document.getElementById('maze-status');
-    const solveButton = document.getElementById('solve-maze'); 
+    // Renamed the existing 'solveButton' to 'resetButton' to better reflect its function when game is active.
+    const resetButton = document.getElementById('solve-maze'); 
+    const gameControls = document.getElementById('game-controls'); // Assuming you have a controls container
+
     const N = 5;
     const START_INDEX = 0;
     const GOAL_INDEX = N * N - 1;
     const TOTAL_CELLS = N * N;
+
+    // --- NEW: Play Button Setup ---
+    // If you already have a 'play-maze' button in HTML, use that ID instead of creating one.
+    const playButton = document.createElement('button');
+    playButton.id = 'play-maze-button';
+    playButton.textContent = 'Start Rat Maze';
+    playButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded', 'mr-2');
+    
+    // Append the new Play button next to the Reset button (assuming a controls container exists)
+    if (gameControls) {
+        gameControls.prepend(playButton); // Add play button before the reset button
+        resetButton.textContent = 'Reset'; // Initial text for the reset button
+        resetButton.disabled = true;       // Initially disabled until game starts
+    }
 
     // Game state variables
     let hardWalls = [];      // Permanent, visible walls (Visual obstacles)
@@ -16,34 +33,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Utility function to get a random integer in a range
     const getRandomInt = (max) => Math.floor(Math.random() * max);
 
-    // --- Maze Setup Functions ---
-
-    // 1. Generates hard walls (visual barriers) and traps (hidden death spots) randomly
+    // --- Maze Setup Functions (Unchanged) ---
     const initializeMaze = () => {
         hardWalls = [];
         hiddenTraps = [];
         
-        // Start with all cells available except start and goal
         let availableIndices = Array.from({ length: TOTAL_CELLS }, (_, i) => i);
         availableIndices = availableIndices.filter(i => i !== START_INDEX && i !== GOAL_INDEX);
 
-        // Randomly place 5-7 Hard Walls (visual barriers)
         const numWalls = getRandomInt(3) + 5; // 5 to 7 walls
         for (let i = 0; i < numWalls && availableIndices.length > 0; i++) {
             const wallIndex = getRandomInt(availableIndices.length);
             hardWalls.push(availableIndices.splice(wallIndex, 1)[0]);
         }
 
-        // Randomly place 3-5 Hidden Traps (lethal, invisible spots)
         const numTraps = getRandomInt(3) + 3; // 3 to 5 traps
         for (let i = 0; i < numTraps && availableIndices.length > 0; i++) {
             const trapIndex = getRandomInt(availableIndices.length);
-            // FIX: Corrected typo from hiddenTraaps to hiddenTraps
             hiddenTraps.push(availableIndices.splice(trapIndex, 1)[0]);
         }
     };
 
-    // --- Game Render/State Management ---
+    // --- Game Render/State Management (Unchanged logic, just using 'resetButton') ---
     
     const renderMaze = () => {
         if (!gridElement) return;
@@ -60,21 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const isTrap = hiddenTraps.includes(i);
 
             if (isWall) {
-                cell.classList.add('maze-wall'); // Visual barrier
+                cell.classList.add('maze-wall');
             }
 
-            // Display GOAL
             if (i === GOAL_INDEX) {
                 cell.innerHTML = '<span class="text-yellow-500">🧀</span>';
             }
             
-            // Display RAT
             if (i === ratPosition) {
                 cell.innerHTML = '<span class="text-indigo-500">🐀</span>';
                 
-                // Add pulse animation on movement
                 if (gameActive) {
-                    // Using a slightly different color and animation name to ensure Tailwind picks it up
                     cell.classList.add('transition-all', 'duration-150', 'bg-green-300/50', 'dark:bg-green-700/50');
                     setTimeout(() => {
                         cell.classList.remove('bg-green-300/50', 'dark:bg-green-700/50');
@@ -82,17 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Reveal Traps and Walls only if game is over
             if (!gameActive) {
                 if (isWall) {
-                     cell.classList.add('maze-wall'); // Ensure visible
+                     cell.classList.add('maze-wall');
                 }
                 if (isTrap) {
-                    if (i !== GOAL_INDEX) { // Don't hide the cheese!
-                        cell.innerHTML = '<span class="text-red-700">💀</span>';
+                    if (i !== GOAL_INDEX) {
+                         cell.innerHTML = '<span class="text-red-700">💀</span>';
                     }
                 }
-                 // Highlight the cell that caused the loss
                 if (!hardWalls.includes(ratPosition) && hiddenTraps.includes(ratPosition) && i === ratPosition) {
                      cell.innerHTML = '<span class="text-red-900">💥</span>';
                      cell.classList.add('bg-red-500/70', 'dark:bg-red-800/70');
@@ -105,6 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gameOver = (win) => {
         gameActive = false;
+        // Enable reset button after game ends
+        resetButton.disabled = false; 
+        playButton.textContent = 'Start New Maze'; // Offer to start a completely new maze
+
         if (win) {
             statusDisplay.textContent = 'You Reached the Cheese! 🎉';
             window.showMessage('VICTORY!', 'The rat found the cheese without hitting any traps!');
@@ -113,39 +122,32 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDisplay.textContent = `Game Over! You hit a ${reason}. 💀`;
             window.showMessage('DEFEAT', `The rat hit a ${reason}! Try again.`);
         }
-        // Re-render to show all trap locations on loss and highlight loss spot
         renderMaze(); 
-        solveButton.textContent = 'Play Again';
     };
     
-    // --- Movement Logic ---
+    // --- Movement Logic (Unchanged) ---
     
     const tryMove = (newPosition) => {
         if (!gameActive) return;
 
-        // 1. Check Hard Walls (Obstacles)
         if (hardWalls.includes(newPosition)) {
-            // Rat hits a visible wall. Game over for hitting obstacle.
-            ratPosition = newPosition; // Move rat to wall boundary for visual confirmation
+            ratPosition = newPosition;
             gameOver(false); 
             return;
         }
 
         ratPosition = newPosition;
         
-        // 2. Check Hidden Traps (Loss condition)
         if (hiddenTraps.includes(newPosition)) {
             gameOver(false);
             return;
         }
 
-        // 3. Check Win Condition
         if (newPosition === GOAL_INDEX) {
             gameOver(true);
             return;
         }
 
-        // Successful move: Re-render
         renderMaze();
     };
 
@@ -157,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let newPos = ratPosition;
         const currentRow = Math.floor(ratPosition / N);
         
-        // Consume arrow key presses to prevent page scrolling
         if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
             event.preventDefault(); 
         }
@@ -210,29 +211,38 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeMaze(); 
         ratPosition = START_INDEX;
         gameActive = true;
+        
+        // Disable the Play/Start button and enable the Reset button
+        playButton.disabled = true;
+        resetButton.disabled = false;
+        
         statusDisplay.textContent = 'Use ARROW keys or WASD to find the cheese (🧀). Avoid hidden traps!';
-        solveButton.textContent = 'Reset Game';
+        playButton.textContent = 'Game Active';
+        resetButton.textContent = 'Reset Maze';
         renderMaze();
     };
     
     // --- Event Listeners Setup ---
-    if (solveButton) solveButton.addEventListener('click', startGame);
+    
+    // The reset button now triggers startGame, which resets all variables.
+    if (resetButton) resetButton.addEventListener('click', startGame);
+    
+    // NEW: Play button listener
+    if (playButton) playButton.addEventListener('click', startGame); 
     
     // Keyboard Listener attached to the document body for global capture
     document.addEventListener('keydown', handleMovement);
 
-    // Touch/Swipe Listener
+    // Touch/Swipe Listener (Unchanged)
     let touchStartX = 0;
     let touchStartY = 0;
     
     gridElement.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
-        // Don't prevent default here to allow vertical scrolling on mobile if not swiping
     }, false);
 
     gridElement.addEventListener('touchmove', (e) => {
-         // Prevent default on move to stop accidental scrolling when swiping horizontally
         e.preventDefault(); 
     }, false);
 
@@ -245,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaX = touchEndX - touchStartX;
         const deltaY = touchEndY - touchStartY;
 
-        // Check if swipe magnitude is large enough (e.g., > 20px)
         if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
             if (deltaX > 0) handleMovement({key: 'ArrowRight'});
             else handleMovement({key: 'ArrowLeft'});
@@ -255,5 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, false);
 
-    startGame(); // Initial game start
+    // Initial setup: Render maze so user can see it before clicking 'Play'
+    initializeMaze();
+    renderMaze();
+    statusDisplay.textContent = 'Ready to play the Rat Maze? Click "Start Rat Maze"!';
 });
